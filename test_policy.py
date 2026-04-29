@@ -57,20 +57,30 @@ def test_model(model_number, n_tests=500, seed=42):
 
 if __name__ == "__main__":
     model_numbers = [5, 10, 20]
+    results = []
 
     for model_number in model_numbers:
         errors = test_model(model_number)
-        
+        results.append(
+            [
+                "model_weights" + str(model_number),
+                np.mean(errors),
+                np.median(errors),
+                np.min(errors),
+                np.max(errors),
+                np.std(errors),
+            ]
+        )
+
+    print()
+    print(f"{'Model':<16} {'Average':>9} {'Median':>9} {'Min':>9} {'Max':>9} {'Std Dev':>9}")
+    print("-" * 66)
+    for model_name, average, median, minimum, maximum, std_dev in results:
         print(
-            "model_weights" + str(model_number),
-            "average:",
-            np.round(np.mean(errors), 3),
-            "median:",
-            np.round(np.median(errors), 3),
-            "min:",
-            np.round(np.min(errors), 3),
-            "max:",
-            np.round(np.max(errors), 3),
-            "std:",
-            np.round(np.std(errors), 3),
+            f"{model_name:<16} "
+            f"{average:>9.3f} "
+            f"{median:>9.3f} "
+            f"{minimum:>9.3f} "
+            f"{maximum:>9.3f} "
+            f"{std_dev:>9.3f}"
         )
