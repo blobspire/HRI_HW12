@@ -1,5 +1,6 @@
 import torch
 import pickle
+import os
 from models import MLPPolicy
 from torch.utils.data import Dataset, DataLoader
 
@@ -61,4 +62,7 @@ def train_model(loadname, savenumber):
 
 # train models
 if __name__ == "__main__":
-    train_model("dataset.pkl", 0)
+    for size in [5, 10, 20]:
+        name = "dataset_" + str(size) + ".pkl"
+        torch.manual_seed(0)
+        train_model(name, size)
