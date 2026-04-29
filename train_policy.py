@@ -24,17 +24,17 @@ def train_model(loadname, savenumber):
 
     # training parameters
     print("[-] training bc")
-    EPOCH = 1000
+    EPOCH = 500
     LR = 0.001
 
     # initialize model and optimizer
-    model = MLPPolicy(state_dim=6, hidden_dim=64, action_dim=3)
+    model = MLPPolicy(state_dim=4, hidden_dim=64, action_dim=2)
     optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 
     # initialize dataset
     print("[-] loading data: " + loadname)
     train_data = MyData(loadname)
-    BATCH_SIZE = 200
+    BATCH_SIZE = max(10, round(len(train_data) / 10.))
     print("my batch size is:", BATCH_SIZE)
     train_set = DataLoader(dataset=train_data, batch_size=BATCH_SIZE, shuffle=True)
 
@@ -43,8 +43,8 @@ def train_model(loadname, savenumber):
         for batch, x in enumerate(train_set):
         
             # collect the demonstrated states and actions
-            states = x[:, 0:6]
-            actions = x[:, 6:9]
+            states = x[:, 0:4]
+            actions = x[:, 4:6]
             actions_hat = model(states)
 
             # compute the loss between actual and predicted
@@ -61,6 +61,4 @@ def train_model(loadname, savenumber):
 
 # train models
 if __name__ == "__main__":
-    train_model("dataset.pkl", 1)
-    train_model("dataset.pkl", 2)
-    train_model("dataset.pkl", 3)
+    train_model("dataset.pkl", 0)
