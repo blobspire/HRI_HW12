@@ -39,16 +39,32 @@ def get_action(state):
 def add_to_dataset(dataset, state, action):
 	dataset.append(state.tolist() + action.tolist())
 
-# visualize a (state, action) pair
-def plot_state_action(state, action):
-	plt.figure()
-	plt.plot(state[0], state[1], 'bo')	# robot position
-	plt.plot(state[2], state[3], 'ro')	# goal position
-	# plot the vector for the action
-	plt.plot([state[0], state[0]+action[0]], [state[1], state[1]+action[1]], 'b-')
-	plt.axis("equal")
-	plt.savefig("state_action.png")
-	plt.close()
+# visualize all (state, action) pairs in one dataset
+def plot_state_actions(states, filename):
+	fig, ax = plt.subplots()
+	for idx, state in enumerate(states):
+		action = get_action(state)
+		robot_label = "robot" if idx == 0 else None
+		goal_label = "goal" if idx == 0 else None
+		action_label = "action" if idx == 0 else None
+
+		ax.plot(state[0], state[1], 'bo', label=robot_label)	# robot position
+		ax.plot(state[2], state[3], 'ro', label=goal_label)	# goal position
+		# plot the vector for the action
+		ax.plot(
+			[state[0], state[0]+action[0]],
+			[state[1], state[1]+action[1]],
+			'b-',
+			label=action_label,
+		)
+
+	ax.set_aspect("equal", adjustable="box")
+	ax.set_xlim(-10.5, 10.5)
+	ax.set_ylim(-10.5, 10.5)
+	ax.grid(True)
+	ax.legend()
+	fig.savefig(filename)
+	plt.close(fig)
 
 states_5 = np.array([
 	[-6.601, 0.0, 6.601, 0.0],
@@ -101,7 +117,7 @@ datasets = {
 }
 
 # build a dataset from one of the optimized state lists
-def get_dataset(states=states_20, filename="dataset_20.pkl"):
+def get_dataset(states=states_20, filename="dataset_20.pkl", plot_filename="state_action_20.png"):
 	dataset = []
 
 	for state in states:
@@ -109,15 +125,18 @@ def get_dataset(states=states_20, filename="dataset_20.pkl"):
 		action = get_action(state)
 		# add the state-action pair to the dataset
 		add_to_dataset(dataset, state, action)
-		# plot the state-action pair
-		plot_state_action(state, action)
 
 	pickle.dump(dataset, open(filename, "wb"))
+	plot_state_actions(states, plot_filename)
 	print(filename, "has this many state-action pairs:", len(dataset))
 
 def get_all_datasets():
 	for size, states in datasets.items():
-		get_dataset(states, "dataset_" + str(size) + ".pkl")
+		get_dataset(
+			states,
+			"dataset_" + str(size) + ".pkl",
+			"state_action_" + str(size) + ".png",
+		)
 
 if __name__ == "__main__":
 	get_all_datasets()
